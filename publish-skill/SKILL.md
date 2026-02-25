@@ -44,17 +44,19 @@ When the user asks to publish or push a skill to their public repo:
 
 6. **Review what changed** — run `git diff --staged --stat` and show the user a summary of files being published.
 
-7. **Commit the change**:
+7. **Confirm with the user** — use `ask_user` to present the file list and ask for confirmation before pushing. Example: "These files will be pushed to the **public** repo: \n\n- skill-name/SKILL.md\n\nPush to public?" with choices `["Yes, push it", "No, cancel"]`. If the user cancels, unstage the changes (`git reset HEAD`) and stop.
+
+8. **Commit the change**:
    ```powershell
    git add -A
    git commit -m "Publish {skill-name}"
    ```
 
-8. **Push to the public remote**:
+9. **Push to the public remote**:
    ```powershell
    git push {public_remote_name} {public_branch}:{remote_branch}
    ```
-   The pre-push hook will prompt for confirmation — the user must approve in the terminal.
+   The pre-push hook runs automatically as a silent safety net — it blocks files matching sensitive patterns (secret, private, draft, journal, internal) but does not prompt interactively.
 
 9. **Return to the private repo**:
    ```powershell
@@ -68,7 +70,8 @@ When the user asks to publish or push a skill to their public repo:
 - **Never push `main` to the public remote.** Only push `{public_branch}`.
 - **Never publish multiple skills without explicit user approval** for each one.
 - **Never modify the skill content** during publishing — copy it exactly as-is from `main`.
-- **Never skip the pre-push hook** — let it run and require the user's confirmation.
+- **Never skip the confirmation step** — always use `ask_user` to confirm before committing and pushing.
+- **Never skip the pre-push hook** — let it run as a silent safety net for pattern checks.
 - If the skill directory doesn't exist, list available skills and ask the user to pick one.
 
 ## Examples
