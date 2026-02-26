@@ -1,6 +1,6 @@
 ---
 name: publish-skill
-description: Publish a skill directory to the public copilot skills repo using the orphan branch worktree workflow. Use when asked to "publish skill", "push skill to public", or "share skill publicly".
+description: Publish a skill directory to the public copilot skills repo using the orphan branch worktree workflow. Use when asked to "publish skill", "push skill to public", "share skill publicly", "check public skills", or "what's out of sync".
 ---
 
 # Publish Skill
@@ -65,6 +65,29 @@ When the user asks to publish or push a skill to their public repo:
 
 10. **Confirm success**: "Published `{skill-name}` to the public skills repo."
 
+## Sync Check Mode
+
+When the user asks to "check my public skills", "what's out of sync", or "which skills need publishing":
+
+1. **List published skills** — enumerate directories under `{public_worktree_path}`.
+
+2. **Compare each skill** — for each published skill, diff the private copy against the public copy:
+   ```powershell
+   cd {private_skills_path}
+   Get-ChildItem "{public_worktree_path}" -Directory | ForEach-Object {
+       $name = $_.Name
+       $diff = git diff --no-index "{public_worktree_path}\$name\SKILL.md" "$name\SKILL.md" 2>$null
+       if ($LASTEXITCODE -ne 0) { "⚠️  $name — out of sync" } else { "✅ $name — in sync" }
+   }
+   ```
+
+3. **Show a summary table** — present results as a clean list with status icons:
+   - ✅ `skill-name` — in sync
+   - ⚠️ `skill-name` — out of sync (changed locally)
+   - ❌ `skill-name` — missing from private repo (deleted?)
+
+4. **Offer to republish** — if any skills are out of sync, use `ask_user` to ask: "Would you like to republish the out-of-sync skills?" with choices `["Yes, republish all", "Let me pick which ones", "No, just checking"]`. Then follow the normal publish workflow for each selected skill.
+
 ## Constraints
 
 - **Never push `main` to the public remote.** Only push `{public_branch}`.
@@ -95,3 +118,18 @@ git push public public-branch:main
 
 **Agent responds:** "I'll publish them one at a time. Starting with `ado`..."
 Then runs the workflow for `ado`, confirms, then repeats for `teams`.
+
+---
+
+**User says:** "check my public skills" or "what's out of sync?"
+
+**Agent runs the sync check and responds:**
+```
+✅ meeting-prep — in sync
+✅ public-repo-setup — in sync
+⚠️  daily-report — out of sync
+✅ publish-skill — in sync
+✅ skill-link — in sync
+⚠️  work-item-health — out of sync
+```
+"2 skills are out of sync. Would you like to republish them?"
