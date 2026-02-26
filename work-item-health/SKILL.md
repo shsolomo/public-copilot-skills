@@ -24,14 +24,32 @@ Reads from the user's global copilot instructions (`~/.copilot/copilot-instructi
 
 The team uses **2-week (14-day) sprints**. Aging is measured in sprint increments.
 
-### Type-Specific Expectations
+### State-Aware Aging
 
-| Work Item Type | Expected Cycle Time | Throughput Target | Aging Thresholds |
+**IMPORTANT:** The aging clock only applies to items in **Active** state (work in progress). Items in **New** state are backlog -- they represent planned work that has not started yet.
+
+- **New** items: Backlog. Do NOT flag for cycle-time aging. Instead, flag only if they have been in New for an unreasonable time with no plan to start (e.g., >6 months for Tasks, >1 year for Stories).
+- **Active** items: In-flight. Apply type-specific aging thresholds below. Age is measured from when the item was activated (or created if ActivatedDate is unavailable).
+- **Ready to Code** items: Treat as New (backlog, queued but not started).
+
+### Type-Specific Expectations (Active items only)
+
+| Work Item Type | Expected Cycle Time | Throughput Target | Aging Thresholds (Active only) |
 |---|---|---|---|
-| **Task** | < 5 days | Multiple per sprint |  >5d,  >1 sprint (14d),  >2 sprints (28d) |
-| **User Story** | 1 sprint (14 days) | 1-2 per sprint |  >1 sprint,  >2 sprints (28d),  >3 sprints (42d) |
+| **Task** | < 5 days | Multiple per sprint | Warning >5d, Alert >1 sprint (14d), Critical >2 sprints (28d) |
+| **User Story** | 1 sprint (14 days) | 1-2 per sprint | Warning >1 sprint, Alert >2 sprints (28d), Critical >3 sprints (42d) |
 | **Bug** | < 5 days (P1-P2), < 1 sprint (P3+) | Varies | Same as Task for P1-P2, same as Story for P3+ |
-| **Feature** | Multi-sprint OK | ~1 per quarter |  >3 sprints (42d),  >6 sprints (84d),  >9 sprints (126d) |
+| **Feature** | Multi-sprint OK | ~1 per quarter | Warning >3 sprints (42d), Alert >6 sprints (84d), Critical >9 sprints (126d) |
+
+### Backlog Staleness (New items only)
+
+Items sitting in New without being started may indicate planning debt:
+
+| Work Item Type | Staleness Thresholds |
+|---|---|
+| **Task** | Warning >3 months, Alert >6 months (may be obsolete) |
+| **User Story** | Warning >6 months, Alert >1 year (re-evaluate relevance) |
+| **Feature** | Warning >1 year (check if still in roadmap) |
 
 ### Refactoring Suggestions
 
